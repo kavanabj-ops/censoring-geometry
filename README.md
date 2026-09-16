@@ -3,10 +3,40 @@
 Companion code for the manuscript:
 *When the wild type hits the ceiling: identifiability of mutation–lineage interactions in pharmacogenomic panels*
 
-## Contents
+## The R0–R5 checklist tool (`censoring-check`)
 
-- **r0_r5_check.py** — the executable version of the R0–R5 rules (the methodological checklist)
-- **analysis scripts 55–83** — simulations, census, and figure generation
+An installable Python tool that encodes the paper's two-step gate (R0) and rules R1–R5 for deciding, before analysis, whether a mutation × lineage interaction is estimable under censoring.
+
+### Install
+
+```
+pip install git+https://github.com/kavanabj-ops/censoring-geometry
+```
+
+Or use it without installing (Python 3.8+, no dependencies beyond the standard library for the core check):
+
+```
+from censoring_check import check_interaction
+```
+
+### Command line
+
+```
+censoring-check --mut-A 6 --wt-A 40 --mut-B 38 --wt-B 17 --wt-censoring 0.945
+```
+
+### Example
+
+```python
+from censoring_check import check_interaction
+
+# BRAF V600E / dabrafenib: WT censoring 94.5% -> non-informative
+r = check_interaction(6, 40, 38, 17, wt_censoring_rate=0.945)
+print(r["recommendation"])
+# R0 (censoring) FAIL: ... report the conditional-lineage rank contrast instead.
+```
+
+## Analysis scripts (55–83)
 
 | Script | Purpose |
 |---|---|
@@ -23,15 +53,8 @@ Companion code for the manuscript:
 ## Data
 
 - GDSC1/GDSC2 fitted dose-response: Genomics of Drug Sensitivity in Cancer (release 27 Oct 2023), https://www.cancerrxgene.org
-- CCLE/DepMap: `CCLE_mutations.csv`, `sample_info.csv`, https://depmap.org
+- CCLE/DepMap: `CCLE_mutations.csv`, `sample_info.csv`, DepMap release 26Q1, https://depmap.org
 
 ## Environment
 
-Python 3.11 with numpy, scipy, pandas, statsmodels.
-
-## Reproducing the analysis
-
-Run scripts 55–79 for the simulations and census; scripts 75 and 83 regenerate the figures. The R0–R5 checklist is importable from `r0_r5_check.py`:
-
-    from r0_r5_check import check_interaction
-    check_interaction(n_mut_A, n_wt_A, n_mut_B, n_wt_B, wt_censoring_rate)
+Python 3.8+ with numpy, scipy, pandas, statsmodels.
